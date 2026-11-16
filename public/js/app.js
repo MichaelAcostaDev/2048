@@ -285,11 +285,121 @@ function showGameOverAlert() {
   restartGameBtn.focus();
 }
 
-function animateBoard() {
-  boardEl.classList.remove('is-animating');
-  void boardEl.offsetWidth;
-  boardEl.classList.add('is-animating');
-  window.setTimeout(() => boardEl.classList.remove('is-animating'), 200);
+function getTileMovementPlan(board, direction) {
+  const plan = new Map();
+  const isVertical = direction === 'up' || direction === 'down';
+  const towardStart = direction === 'left' || direction === 'up';
+
+  for (let lineIndex = 0; lineIndex < 4; lineIndex += 1) {
+    const line = Array.from({ length: 4 }, (_, position) => {
+      const offset = towardStart ? position : 3 - position;
+      return isVertical ? offset * 4 + lineIndex : lineIndex * 4 + offset;
+    });
+    const tiles = line
+      .map((index) => ({
+        index,
+        value: board[Math.floor(index / 4)][index % 4]
+      }))
+      .filter((tile) => tile.value !== 0);
+
+    let sourcePosition = 0;
+    let destinationPosition = 0;
+    while (sourcePosition < tiles.length) {
+      const first = tiles[sourcePosition];
+      const merged = sourcePosition + 1 < tiles.length
+        && first.value === tiles[sourcePosition + 1].value;
+      const sourceIndices = merged
+        ? [first.index, tiles[sourcePosition + 1].index]
+        : [first.index];
+
+      plan.set(line[destinationPosition], { sourceIndices, merged });
+      sourcePosition += merged ? 2 : 1;
+      destinationPosition += 1;
+    }
+  }
+
+  return plan;
+}
+
+function addTileAnimation(tile, className) {
+  tile.classList.add(className);
+  tile.addEventListener('animationend', () => tile.classList.remove(className), { once: true });
+}
+
+function animateMergeGhost(sourceIndex, destinationTile, previousTiles, previousRects) {
+  const sourceRect = previousRects[sourceIndex];
+  const destinationRect = destinationTile.getBoundingClientRect();
+  const ghost = previousTiles[sourceIndex].cloneNode(true);
+  const offsetX = destinationRect.left - sourceRect.left;
+  const offsetY = destinationRect.top - sourceRect.top;
+  const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 220;
+
+  ghost.classList.add('tile--merge-ghost');
+  Object.assign(ghost.style, {
+    position: 'fixed',
+    left: `${sourceRect.left}px`,
+    top: `${sourceRect.top}px`,
+    width: `${sourceRect.width}px`,
+    height: `${sourceRect.height}px`,
+    margin: '0',
+    zIndex: '3',
+    transform: 'none',
+    transition: 'none',
+    opacity: '1'
+  });
+  document.body.appendChild(ghost);
+
+  ghost.animate([
+    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+    { transform: `translate(${offsetX}px, ${offsetY}px) scale(0.65)`, opacity: 0 }
+  ], {
+    duration,
+    easing: 'cubic-bezier(.2,.8,.2,1)'
+  }).onfinish = () => ghost.remove();
+}
+
+function animateTileMovement(plan, previousTiles, previousRects) {
+  const currentTiles = Array.from(boardEl.children);
+  const mappedDestinations = new Set(plan.keys());
+
+  plan.forEach((movement, destinationIndex) => {
+    const tile = currentTiles[destinationIndex];
+    const sourceRect = previousRects[movement.sourceIndices[0]];
+    const destinationRect = tile.getBoundingClientRect();
+    const offsetX = sourceRect.left - destinationRect.left;
+    const offsetY = sourceRect.top - destinationRect.top;
+
+    if (offsetX !== 0 || offsetY !== 0) {
+      tile.style.position = 'relative';
+      tile.style.zIndex = '2';
+      tile.style.transition = 'none';
+      tile.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+      void tile.offsetWidth;
+      requestAnimationFrame(() => {
+        tile.style.transition = '';
+        tile.style.transform = '';
+      });
+
+      const clearPositioning = (event) => {
+        if (event.propertyName !== 'transform') return;
+        tile.style.position = '';
+        tile.style.zIndex = '';
+        tile.removeEventListener('transitionend', clearPositioning);
+      };
+      tile.addEventListener('transitionend', clearPositioning);
+    }
+
+    if (movement.merged) {
+      addTileAnimation(tile, 'tile--merged');
+      animateMergeGhost(movement.sourceIndices[1], tile, previousTiles, previousRects);
+    }
+  });
+
+  currentTiles.forEach((tile, index) => {
+    if (!tile.classList.contains('tile--0') && !mappedDestinations.has(index)) {
+      addTileAnimation(tile, 'tile--spawn');
+    }
+  });
 }
 
 function playMoveSound() {
@@ -318,12 +428,17 @@ function playMoveSound() {
 }
 
 function move(direction) {
+  const previousBoard = state.board.map((row) => [...row]);
+  const previousTiles = Array.from(boardEl.children);
+  const previousRects = previousTiles.map((tile) => tile.getBoundingClientRect());
   const wasLost = state.lost;
   const game = new Game2048(state);
   state = game.move(direction);
   saveState();
-  animateBoard();
   render();
+  if (JSON.stringify(previousBoard) !== JSON.stringify(state.board)) {
+    animateTileMovement(getTileMovementPlan(previousBoard, direction), previousTiles, previousRects);
+  }
   playMoveSound();
   if (!wasLost && state.lost) showGameOverAlert();
 }
@@ -335,7 +450,6 @@ function resetGame() {
   const theme = state?.theme || 'light';
   state = new Game2048({ theme }).toObject();
   saveState();
-  animateBoard();
   render();
 }
 

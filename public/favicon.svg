@@ -1,7 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Nova 2048 icon">
-  <rect width="64" height="64" rx="16" fill="#101826"/>
-  <rect x="10" y="10" width="44" height="44" rx="12" fill="#f7f9fc"/>
-  <path d="M22 24h20" stroke="#4b6ef5" stroke-width="3" stroke-linecap="round"/>
-  <path d="M22 32h20" stroke="#6d5dfc" stroke-width="3" stroke-linecap="round"/>
-  <path d="M22 40h20" stroke="#4b6ef5" stroke-width="3" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="2048">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#21183b"/>
+      <stop offset="1" stop-color="#513276"/>
+    </linearGradient>
+    <linearGradient id="highlight" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ffd76a"/>
+      <stop offset="1" stop-color="#f39b38"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#background)"/>
+  <rect x="8" y="9" width="22" height="18" rx="5" fill="#f2b179"/>
+  <text x="19" y="22" fill="#fffaf2" font-family="Arial, sans-serif" font-size="12" font-weight="800" text-anchor="middle">2</text>
+  <rect x="34" y="9" width="22" height="18" rx="5" fill="#f59563"/>
+  <text x="45" y="22" fill="#fffaf2" font-family="Arial, sans-serif" font-size="12" font-weight="800" text-anchor="middle">4</text>
+  <rect x="8" y="33" width="48" height="23" rx="6" fill="url(#highlight)"/>
+  <text x="32" y="49" fill="#4a2d36" font-family="Arial, sans-serif" font-size="16" font-weight="900" letter-spacing="-1" text-anchor="middle">2048</text>
 </svg>

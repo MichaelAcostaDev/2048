@@ -1,66 +1,76 @@
 # 2048
 
-Una versión web del clásico juego de fichas, con controles para teclado y móvil, una interfaz adaptable y progreso guardado en el navegador. El objetivo es combinar valores iguales hasta alcanzar la ficha 2048.
+> **Move. Merge. Reach 2048.**
 
-[Jugar en vivo](https://michael-2048.vercel.app/) · [Repositorio](https://github.com/MichaelAcostaDev/2048)
+A web version of the classic tile game, with keyboard and touch controls, a responsive interface, and progress saved in the browser. Combine matching tiles to reach the 2048 tile.
 
-## El problema y la solución
+<p align="center">
+  <a href="https://michael-2048.vercel.app/">
+    <img src="https://img.shields.io/badge/Play%20Live-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Play 2048 on Vercel">
+  </a>
+  <img src="https://img.shields.io/badge/Backend-Ruby%20%2B%20Sinatra-CC342D?style=for-the-badge" alt="Ruby and Sinatra">
+  <img src="https://img.shields.io/badge/Frontend-Vanilla%20JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="Vanilla JavaScript">
+</p>
 
-Los juegos de lógica deben ser fáciles de entender y responder de inmediato, tanto en escritorio como en dispositivos táctiles. Este proyecto reúne las reglas de 2048 en una experiencia ligera: el tablero se actualiza al instante, los controles se adaptan al dispositivo y el progreso permanece disponible entre visitas en el mismo navegador.
+[Live game](https://michael-2048.vercel.app/) · [Source code](https://github.com/MichaelAcostaDev/2048)
 
-## Características principales
+## 🎯 Problem and solution
 
-- **Tablero 4 × 4:** desplaza las fichas y combina valores iguales para aumentar su puntuación.
-- **Controles flexibles:** flechas, WASD y gestos de deslizamiento.
-- **Progreso local:** guarda automáticamente el tablero, la puntuación y el mejor resultado en el navegador.
-- **Temas claro y oscuro:** el tema claro se carga por defecto y el usuario puede alternar entre ambos.
-- **Interfaz bilingüe:** selecciona español o inglés según los idiomas preferidos del dispositivo.
-- **Respuesta visual y sonora:** animaciones de desplazamiento, aparición y fusión de fichas, además de sonido opcional.
-- **Cierre de partida claro:** al quedarse sin movimientos, muestra un diálogo con la puntuación final y opciones para iniciar otra partida o volver al tablero.
-- **Diseño adaptable:** pensado para pantallas de escritorio y móviles; respeta la preferencia del sistema para reducir el movimiento.
+Puzzle games should be easy to pick up and respond instantly on both desktop and touch devices. This project delivers a lightweight 2048 experience: moves update immediately, controls adapt to the device, and progress remains available between visits in the same browser.
 
-## Arquitectura y stack tecnológico
+## ✨ Key features
 
-| Componente | Tecnología | Responsabilidad |
+- **4 × 4 game board:** move and merge matching tiles to increase your score.
+- **Flexible controls:** use the arrow keys, WASD, or swipe gestures.
+- **Local progress:** automatically saves the board, score, and best score in the browser.
+- **Light and dark themes:** light mode is the default, with a toggle for dark mode.
+- **Bilingual interface:** selects English or Spanish based on the device's preferred languages.
+- **Visual and audio feedback:** sliding, spawning, and merge animations, plus optional sound.
+- **Game-over dialog:** displays the final score and lets players start a new game or return to the board.
+- **Responsive design:** supports desktop and mobile layouts and respects the system's reduced-motion preference.
+
+## 🏗️ Architecture and technology stack
+
+| Component | Technology | Responsibility |
 | --- | --- | --- |
-| Aplicación web | Ruby y Sinatra | Sirve la página, los recursos estáticos y los endpoints JSON del juego. |
-| Reglas del juego | Ruby | Mantiene la lógica de movimientos, fusiones, puntuación y fin de partida en `Game2048`. |
-| Vista | ERB y HTML | Presenta la estructura de la interfaz y el tablero. |
-| Interacción | JavaScript | Gestiona el estado durante la partida, los controles, el renderizado, las traducciones y las animaciones. |
-| Sonido | Web Audio API | Genera el efecto sonoro de los movimientos directamente en el navegador. |
-| Estilos | CSS | Define los temas, la presentación adaptable y los efectos visuales. |
-| Persistencia | `localStorage` | Conserva el progreso y las preferencias en el navegador del usuario. |
-| Despliegue | Vercel | Publica la aplicación Ruby mediante la configuración del proyecto. |
+| Web application | Ruby and Sinatra | Serves the page, static assets, and JSON game endpoints. |
+| Game rules | Ruby | Implements moves, merges, scoring, and game-over detection in `Game2048`. |
+| View | ERB and HTML | Defines the page structure and game board. |
+| Interaction | JavaScript | Manages the in-browser game state, controls, rendering, translations, and animations. |
+| Sound | Web Audio API | Generates move sounds directly in the browser. |
+| Styling | CSS | Defines themes, responsive layouts, and visual effects. |
+| Persistence | `localStorage` | Stores game progress and preferences in the user's browser. |
+| Deployment | Vercel | Hosts the Ruby application through the project's deployment configuration. |
 
-La aplicación separa la entrada web de las reglas del juego: `app.rb` define las rutas de Sinatra y `lib/game_logic.rb` contiene la lógica Ruby. En el navegador, JavaScript mantiene una partida interactiva y guarda su estado localmente, evitando una petición al servidor por cada movimiento.
+The application separates web routing from game rules: `app.rb` defines the Sinatra routes, while `lib/game_logic.rb` contains the Ruby game model. In the browser, JavaScript manages a responsive game session and stores its state locally, so each move does not require a server round trip.
 
-## Decisiones técnicas y retos
+## 🧠 Technical decisions and challenges
 
-- **Stack ligero:** Sinatra y JavaScript sin frameworks adicionales mantienen la aplicación sencilla y adecuada al alcance del juego.
-- **Interacción inmediata:** el navegador procesa los movimientos y renderiza los cambios localmente; `localStorage` evita perder el progreso al cerrar o recargar la página.
-- **Reglas explícitas:** la lógica Ruby concentra las operaciones de movimiento, fusión, puntuación y detección del fin de partida.
-- **Animaciones con contexto:** el desplazamiento conserva el origen de las fichas, mientras que las fusiones y las nuevas fichas reciben efectos propios. Las animaciones también consideran la preferencia de movimiento reducido del sistema.
-- **Adaptación al usuario:** el tema y el idioma se ajustan a preferencias claras, sin requerir una configuración inicial.
-- **Reto de consistencia:** las reglas se implementan tanto en Ruby como en JavaScript para atender las rutas del servidor y la partida interactiva. Mantener ambas implementaciones alineadas es un punto importante para futuras pruebas.
+- **Lightweight stack:** Sinatra and framework-free JavaScript keep the application focused and straightforward.
+- **Immediate interaction:** the browser processes moves and renders the board locally; `localStorage` preserves progress across reloads.
+- **Explicit game rules:** the Ruby model handles movement, merging, scoring, and terminal-state detection.
+- **Context-aware animations:** tiles retain their source positions while sliding; merges and newly spawned tiles have distinct effects. Motion also respects the operating system's reduced-motion setting.
+- **Preference-aware UI:** theme and language defaults adapt to user preferences without requiring initial setup.
+- **Consistency challenge:** game rules exist in both Ruby and JavaScript to support the server endpoints and in-browser gameplay. Keeping both implementations aligned is an important area for future testing.
 
-## Estado del proyecto y mejoras futuras
+## 🚀 Project status and roadmap
 
-### Completado
+### Completed
 
-- Juego funcional con movimiento en las cuatro direcciones, fusiones y puntuación.
-- Interfaz adaptable con temas claro y oscuro.
-- Guardado local del estado de la partida.
-- Detección automática de español e inglés.
-- Sonido opcional, animaciones y diálogo de fin de partida.
+- Playable game with movement in all four directions, tile merges, and scoring.
+- Responsive interface with light and dark themes.
+- Local game-state persistence.
+- Automatic English and Spanish language selection.
+- Optional sound, tile animations, and a game-over dialog.
 
-### Roadmap sugerido
+### Suggested roadmap
 
-- Incorporar pruebas automatizadas para validar las reglas y mantener consistentes las implementaciones de Ruby y JavaScript.
-- Añadir una preferencia manual de idioma además de la detección del dispositivo.
-- Explorar sincronización del progreso entre dispositivos mediante almacenamiento remoto.
-- Ampliar las opciones de accesibilidad y personalización visual.
+- Add automated tests for the game rules and consistency between the Ruby and JavaScript implementations.
+- Add a manual language selector alongside device-based language detection.
+- Explore remote progress synchronization across devices.
+- Expand accessibility and visual customization options.
 
-## Autor
+## 👤 Author
 
 **Michael Acosta**
 

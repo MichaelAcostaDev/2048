@@ -1,5 +1,5 @@
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   --bg: #faf8ef;
   --panel: #fbf7ef;
   --text: #776e65;
@@ -7,7 +7,11 @@
   --accent: #edc22e;
   --accent-2: #f2b179;
   --tile-empty: #cdc1b4;
-  --tile-border: #bbada0;
+  --tile-border: transparent;
+  --board-gap: 0.25rem;
+  --board-padding: 0.25rem;
+  --board-radius: 4px;
+  --tile-radius: 2px;
   --shadow: 0 8px 20px rgba(60, 50, 40, 0.12);
   --board-bg: #bbada0;
   --score-bg: #eee4da;
@@ -49,7 +53,11 @@ html[data-theme='light'] {
   --accent: #edc22e;
   --accent-2: #f2b179;
   --tile-empty: #cdc1b4;
-  --tile-border: #bbada0;
+  --tile-border: transparent;
+  --board-gap: 0.25rem;
+  --board-padding: 0.25rem;
+  --board-radius: 4px;
+  --tile-radius: 2px;
   --shadow: 0 8px 20px rgba(60, 50, 40, 0.12);
   --board-bg: #bbada0;
   --score-bg: #eee4da;
@@ -92,6 +100,10 @@ html[data-theme='dark'] {
   --accent-2: #f97316;
   --tile-empty: #334155;
   --tile-border: #475569;
+  --board-gap: 0.6rem;
+  --board-padding: 0.65rem;
+  --board-radius: 14px;
+  --tile-radius: 10px;
   --shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   --board-bg: #1f2937;
   --score-bg: #1f2937;
@@ -230,10 +242,10 @@ h1 {
 .board {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.6rem;
+  gap: var(--board-gap);
   background: var(--board-bg);
-  border-radius: 14px;
-  padding: 0.65rem;
+  border-radius: var(--board-radius);
+  padding: var(--board-padding);
   aspect-ratio: 1;
   touch-action: none;
   user-select: none;
@@ -241,7 +253,7 @@ h1 {
 }
 
 .tile {
-  border-radius: 10px;
+  border-radius: var(--tile-radius);
   display: grid;
   place-items: center;
   font-weight: 700;
@@ -284,6 +296,11 @@ h1 {
   .actions { width: 100%; }
   .btn { flex: 1; text-align: center; border-radius: 13px; }
   .scores { gap: 0.45rem; }
-  .board { gap: 0.5rem; padding: 0.55rem; }
-  .tile { min-height: 54px; border-radius: 12px; }
+  html[data-theme='dark'] {
+    --board-gap: 0.5rem;
+    --board-padding: 0.55rem;
+    --board-radius: 18px;
+    --tile-radius: 12px;
+  }
+  .tile { min-height: 54px; }
 }

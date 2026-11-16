@@ -19,7 +19,7 @@ class Game2048 {
       this.won = Boolean(state.won);
       this.lost = Boolean(state.lost);
       this.best_score = Number(state.best_score) || 0;
-      this.theme = state.theme || 'dark';
+      this.theme = state.theme || 'light';
       if (!this.board.some((row) => row.some((value) => value !== 0))) {
         this.spawnTile();
         this.spawnTile();
@@ -30,7 +30,7 @@ class Game2048 {
       this.won = false;
       this.lost = false;
       this.best_score = 0;
-      this.theme = state && state.theme ? state.theme : 'dark';
+      this.theme = state && state.theme ? state.theme : 'light';
       this.spawnTile();
       this.spawnTile();
     }
@@ -168,8 +168,12 @@ function loadState() {
     state = saved;
   } else {
     state = new Game2048().toObject();
-    saveState();
   }
+  if (localStorage.getItem('nova2048LightThemeDefault') !== '1') {
+    state.theme = 'light';
+    localStorage.setItem('nova2048LightThemeDefault', '1');
+  }
+  saveState();
   render();
 }
 
@@ -199,7 +203,7 @@ function render() {
     statusEl.textContent = 'Mueve las fichas con las flechas o deslizando.';
   }
 
-  document.documentElement.setAttribute('data-theme', state.theme || 'dark');
+  document.documentElement.setAttribute('data-theme', state.theme || 'light');
   themeToggleBtn.textContent = state.theme === 'dark' ? 'Tema: oscuro' : 'Tema: claro';
   soundToggleBtn.textContent = soundEnabled ? 'Sonido: on' : 'Sonido: off';
 }
@@ -246,7 +250,7 @@ function move(direction) {
 }
 
 function resetGame() {
-  const theme = state?.theme || 'dark';
+  const theme = state?.theme || 'light';
   state = new Game2048({ theme }).toObject();
   saveState();
   animateBoard();

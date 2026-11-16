@@ -9,14 +9,14 @@ class Game2048
       @won = state.fetch('won', false)
       @lost = state.fetch('lost', false)
       @best_score = state.fetch('best_score', 0).to_i
-      @theme = state.fetch('theme', 'dark')
+      @theme = state.fetch('theme', 'light')
     else
       @board = Array.new(4) { Array.new(4, 0) }
       @score = 0
       @won = false
       @lost = false
       @best_score = 0
-      @theme = state.is_a?(Hash) ? state.fetch('theme', 'dark') : 'dark'
+      @theme = state.is_a?(Hash) ? state.fetch('theme', 'light') : 'light'
       spawn_tile
       spawn_tile
     end

@@ -48,7 +48,7 @@ class Nova2048App < Sinatra::Base
 
   post '/reset' do
     payload = parse_json_request
-    theme = current_state_from_payload(payload).fetch('theme', 'dark')
+    theme = current_state_from_payload(payload).fetch('theme', 'light')
     game = Game2048.new({ 'theme' => theme })
 
     content_type :json
@@ -58,7 +58,7 @@ class Nova2048App < Sinatra::Base
   post '/theme' do
     payload = parse_json_request
     state = current_state_from_payload(payload)
-    state['theme'] = payload['theme'] || 'dark'
+    state['theme'] = payload['theme'] || 'light'
 
     content_type :json
     Game2048.from_h(state).to_h.to_json

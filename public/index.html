@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="2048 en Ruby con una interfaz simple y funcional para móvil y escritorio.">
+    <meta id="page-description" name="description" content="2048 en Ruby con una interfaz simple y funcional para móvil y escritorio.">
     <title>2048</title>
     <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
     <link rel="stylesheet" href="/css/styles.css">
@@ -24,11 +24,11 @@
 
         <div class="scores">
           <div class="score-card">
-            <span>Puntuación</span>
+            <span id="score-label">Puntuación</span>
             <strong id="score">0</strong>
           </div>
           <div class="score-card">
-            <span>Mejor</span>
+            <span id="best-score-label">Mejor</span>
             <strong id="best-score">0</strong>
           </div>
         </div>
@@ -36,6 +36,20 @@
         <div id="status" class="status" aria-live="polite">Mueve las fichas con las flechas o deslizando.</div>
         <div id="board" class="board" tabindex="0"></div>
       </section>
+      <dialog id="game-over-dialog" class="game-over-dialog" aria-labelledby="game-over-title" aria-describedby="game-over-description">
+        <div class="game-over-mark" aria-hidden="true">!</div>
+        <span id="game-over-eyebrow" class="game-over-eyebrow">FIN DE LA PARTIDA</span>
+        <h2 id="game-over-title">¡No quedan movimientos!</h2>
+        <p id="game-over-description">El tablero está lleno y ya no hay combinaciones posibles.</p>
+        <div class="game-over-score">
+          <span id="final-score-label">Puntuación final</span>
+          <strong id="final-score">0</strong>
+        </div>
+        <div class="game-over-actions">
+          <button id="restart-game" class="btn btn-primary">Nueva partida</button>
+          <button id="dismiss-game-over" class="btn btn-secondary">Ver tablero</button>
+        </div>
+      </dialog>
     </main>
 
     <script src="/js/app.js"></script>

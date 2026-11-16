@@ -5,6 +5,56 @@ const statusEl = document.getElementById('status');
 const newGameBtn = document.getElementById('new-game');
 const themeToggleBtn = document.getElementById('theme-toggle');
 const soundToggleBtn = document.getElementById('sound-toggle');
+const gameOverDialog = document.getElementById('game-over-dialog');
+const finalScoreEl = document.getElementById('final-score');
+const restartGameBtn = document.getElementById('restart-game');
+const dismissGameOverBtn = document.getElementById('dismiss-game-over');
+
+const translations = {
+  en: {
+    description: 'A simple, functional 2048 game in Ruby for mobile and desktop.',
+    newGame: 'New game',
+    themeLight: 'Theme: light',
+    themeDark: 'Theme: dark',
+    soundOn: 'Sound: on',
+    soundOff: 'Sound: off',
+    score: 'Score',
+    best: 'Best',
+    instructions: 'Use the arrow keys or swipe to move the tiles.',
+    won: 'You reached 2048!',
+    gameOverEyebrow: 'GAME OVER',
+    gameOverTitle: 'No moves left!',
+    gameOverDescription: 'The board is full and no more merges are possible.',
+    finalScore: 'Final score',
+    restart: 'Play again',
+    dismiss: 'View board'
+  },
+  es: {
+    description: '2048 en Ruby con una interfaz simple y funcional para móvil y escritorio.',
+    newGame: 'Nueva partida',
+    themeLight: 'Tema: claro',
+    themeDark: 'Tema: oscuro',
+    soundOn: 'Sonido: activado',
+    soundOff: 'Sonido: desactivado',
+    score: 'Puntuación',
+    best: 'Mejor',
+    instructions: 'Mueve las fichas con las flechas o deslizando.',
+    won: '¡Llegaste a 2048!',
+    gameOverEyebrow: 'FIN DE LA PARTIDA',
+    gameOverTitle: '¡No quedan movimientos!',
+    gameOverDescription: 'El tablero está lleno y ya no hay combinaciones posibles.',
+    finalScore: 'Puntuación final',
+    restart: 'Nueva partida',
+    dismiss: 'Ver tablero'
+  }
+};
+
+const deviceLanguages = navigator.languages && navigator.languages.length
+  ? navigator.languages
+  : [navigator.language || 'en'];
+const preferredLanguage = deviceLanguages.find((locale) => /^(en|es)(-|$)/i.test(locale));
+const language = preferredLanguage ? preferredLanguage.slice(0, 2).toLowerCase() : 'en';
+const text = translations[language];
 
 let state = null;
 let soundEnabled = true;
@@ -162,6 +212,24 @@ function saveState() {
   }
 }
 
+function applyTranslations() {
+  document.documentElement.lang = language;
+  document.getElementById('page-description').content = text.description;
+  newGameBtn.textContent = text.newGame;
+  document.getElementById('score-label').textContent = text.score;
+  document.getElementById('best-score-label').textContent = text.best;
+  document.getElementById('game-over-eyebrow').textContent = text.gameOverEyebrow;
+  document.getElementById('game-over-title').textContent = text.gameOverTitle;
+  document.getElementById('game-over-description').textContent = text.gameOverDescription;
+  document.getElementById('final-score-label').textContent = text.finalScore;
+  restartGameBtn.textContent = text.restart;
+  dismissGameOverBtn.textContent = text.dismiss;
+}
+
+function updateSoundToggle() {
+  soundToggleBtn.textContent = soundEnabled ? text.soundOn : text.soundOff;
+}
+
 function loadState() {
   const saved = getSavedState();
   if (saved && saved.board && Array.isArray(saved.board) && saved.board.length === 4) {
@@ -175,6 +243,7 @@ function loadState() {
   }
   saveState();
   render();
+  if (state.lost) showGameOverAlert();
 }
 
 function render() {
@@ -196,16 +265,24 @@ function render() {
   bestScoreEl.textContent = state.best_score || 0;
 
   if (state.lost) {
-    statusEl.textContent = 'No quedan movimientos. Empieza otra partida.';
+    statusEl.textContent = '';
   } else if (state.won) {
-    statusEl.textContent = '¡Llegaste a 2048!';
+    statusEl.textContent = text.won;
   } else {
-    statusEl.textContent = 'Mueve las fichas con las flechas o deslizando.';
+    statusEl.textContent = text.instructions;
   }
 
   document.documentElement.setAttribute('data-theme', state.theme || 'light');
-  themeToggleBtn.textContent = state.theme === 'dark' ? 'Tema: oscuro' : 'Tema: claro';
-  soundToggleBtn.textContent = soundEnabled ? 'Sonido: on' : 'Sonido: off';
+  themeToggleBtn.textContent = state.theme === 'dark' ? text.themeDark : text.themeLight;
+  updateSoundToggle();
+}
+
+function showGameOverAlert() {
+  finalScoreEl.textContent = String(state.score || 0);
+  if (!gameOverDialog.open) {
+    gameOverDialog.showModal();
+  }
+  restartGameBtn.focus();
 }
 
 function animateBoard() {
@@ -241,15 +318,20 @@ function playMoveSound() {
 }
 
 function move(direction) {
+  const wasLost = state.lost;
   const game = new Game2048(state);
   state = game.move(direction);
   saveState();
   animateBoard();
   render();
   playMoveSound();
+  if (!wasLost && state.lost) showGameOverAlert();
 }
 
 function resetGame() {
+  if (gameOverDialog.open) {
+    gameOverDialog.close();
+  }
   const theme = state?.theme || 'light';
   state = new Game2048({ theme }).toObject();
   saveState();
@@ -295,10 +377,12 @@ function handlePointerEnd(event) {
 }
 
 newGameBtn.addEventListener('click', resetGame);
+restartGameBtn.addEventListener('click', resetGame);
+dismissGameOverBtn.addEventListener('click', () => gameOverDialog.close());
 themeToggleBtn.addEventListener('click', toggleTheme);
 soundToggleBtn.addEventListener('click', () => {
   soundEnabled = !soundEnabled;
-  soundToggleBtn.textContent = soundEnabled ? 'Sonido: on' : 'Sonido: off';
+  updateSoundToggle();
 });
 
 window.addEventListener('keydown', handleKeydown);
@@ -308,4 +392,5 @@ boardEl.addEventListener('pointerdown', handlePointerStart, { passive: true });
 boardEl.addEventListener('pointerup', handlePointerEnd, { passive: true });
 boardEl.addEventListener('click', () => boardEl.focus());
 
+applyTranslations();
 loadState();
